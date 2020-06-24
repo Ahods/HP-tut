@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 
-public class playerHpHud : MonoBehaviour {
+public class PlayerHpHud : MonoBehaviour {
 
     /// <summary>
     /// Using a list so we can easily add to in the future
@@ -13,37 +13,45 @@ public class playerHpHud : MonoBehaviour {
     private List<GameObject> totalHP;
 
     /// <summary>
-    /// Object to represent teh player health
+    /// Object to represent the player health
     /// </summary>
     [SerializeField]
     private GameObject heart;
 
+    [Header("Heart Sprites")]
     /// <summary>
-    /// Sprites to show full or no health.
+    /// Sprites to show health.
     /// Can be expanded with quarter hearts
     /// </summary>
-    private Sprite fullHeart, emptyHeart;
+    public Sprite fullHeart; 
+    public Sprite emptyHeart; 
+    public Sprite halfHeart; 
+    public Sprite quarterHeart; 
+    public Sprite threequarterHeart;
 
     /// <summary>
     /// int are easier to deal with than doubles 
     /// when trying to deal with quarter hearts.
     /// </summary>
-    private int maxHP;
-    private int hp;
+    public int MaxHP;
+    public int Hp;
+
+    public int MaxHPIcons;
+    public int HeartSegments;
+
+    public Vector2 IconStartPos;
+    public float IconPosOffset;
+    public int IconRows;
 
     /// <summary>
     /// Set up for the health system.
     /// </summary>
     void Start () {
-        maxHP = GetComponent<PlayerInfo>().maxHP;
-        hp = GetComponent<PlayerInfo>().hp;
-
-        fullHeart = (Sprite)AssetDatabase.LoadAssetAtPath("Assets/Sprites/hudHeartFull.png", typeof(Sprite));
-        emptyHeart = (Sprite)AssetDatabase.LoadAssetAtPath("Assets/Sprites/hudHeartEmpty.png", typeof(Sprite));
+        Hp = MaxHP;
 
         float offset;
 
-        for (int i = 0; i < hp; i++)
+        for (int i = 0; i < Hp; i++)
         {
             offset = (1.0f * i);
             Instantiate(heart, new Vector3(-10 + offset, 5, 0), Quaternion.identity);
@@ -55,13 +63,13 @@ public class playerHpHud : MonoBehaviour {
     /// <summary>
     /// Updates current health for player.
     /// </summary>
-    void Update () {
-        maxHP = GetComponent<PlayerInfo>().maxHP;
-        hp = GetComponent<PlayerInfo>().hp;
+    void LateUpdate () {
+        MaxHP = GetComponent<PlayerInfo>().maxHP;
+        Hp = GetComponent<PlayerInfo>().hp;
 
-        for(int i = 0; i < maxHP; i++)
+        for(int i = 0; i < MaxHP; i++)
         {
-            if(i < hp)
+            if(i < Hp)
             {
                 // full hearts
                 totalHP[i].GetComponent<SpriteRenderer>().sprite = fullHeart;
@@ -87,7 +95,7 @@ public class playerHpHud : MonoBehaviour {
         float offset = (1.0f * totalHP.Count);
         totalHP.Add(Instantiate(heart, new Vector3(-10 + offset, 5, 0), Quaternion.identity) as GameObject);
 
-        maxHP++;
+        MaxHP++;
     }
 
     /*
