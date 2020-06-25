@@ -9,75 +9,73 @@ public class PlayerHpHud : MonoBehaviour {
     /// Using a list so we can easily add to in the future
     /// if you want the player to gain additional health
     /// </summary>
-    [SerializeField]
-    private List<GameObject> totalHP;
+    private List<GameObject> totalIcons;
 
     /// <summary>
     /// Object to represent the player health
     /// </summary>
-    [SerializeField]
-    private GameObject heart;
+    public GameObject _Icon;
+    public Transform _CanvasPanel;
 
-    [Header("Heart Sprites")]
     /// <summary>
     /// Sprites to show health.
     /// Can be expanded with quarter hearts
     /// </summary>
-    public Sprite fullHeart; 
-    public Sprite emptyHeart; 
-    public Sprite halfHeart; 
-    public Sprite quarterHeart; 
-    public Sprite threequarterHeart;
+    public Sprite _FullHeart; 
+    public Sprite _EmptyHeart; 
+    public Sprite _HalfHeart; 
+    public Sprite _QuarterHeart; 
+    public Sprite _ThreequarterHeart;
 
     /// <summary>
     /// int are easier to deal with than doubles 
     /// when trying to deal with quarter hearts.
     /// </summary>
-    public int MaxHP;
-    public int Hp;
+    public int _MaxHP;
+    public int _Hp;
 
-    public int MaxHPIcons;
-    public int HeartSegments;
+    public int _NumHPIcons;
+    public int _HeartSegments;
 
-    public Vector2 IconStartPos;
-    public float IconPosOffset;
-    public int IconRows;
+    public Vector2 _IconStartPos;
+    public float _IconPosOffset;
+    public int _IconsPerRow;
 
     /// <summary>
     /// Set up for the health system.
     /// </summary>
     void Start () {
-        Hp = MaxHP;
+        _Hp = _MaxHP;
 
         float offset;
 
-        for (int i = 0; i < Hp; i++)
+        for (int i = 0; i < _Hp; i++)
         {
             offset = (1.0f * i);
-            Instantiate(heart, new Vector3(-10 + offset, 5, 0), Quaternion.identity);
+            Instantiate(_Icon, new Vector3(-10 + offset, 5, 0), Quaternion.identity);
         }
-        
-        totalHP = new List<GameObject>(GameObject.FindGameObjectsWithTag("hudHeart"));
+
+        totalIcons = new List<GameObject>(GameObject.FindGameObjectsWithTag("hudHeart"));
     }
     
     /// <summary>
     /// Updates current health for player.
     /// </summary>
     void LateUpdate () {
-        MaxHP = GetComponent<PlayerInfo>().maxHP;
-        Hp = GetComponent<PlayerInfo>().hp;
+        _MaxHP = GetComponent<PlayerInfo>().maxHP;
+        _Hp = GetComponent<PlayerInfo>().hp;
 
-        for(int i = 0; i < MaxHP; i++)
+        for(int i = 0; i < _MaxHP; i++)
         {
-            if(i < Hp)
+            if(i < _Hp)
             {
                 // full hearts
-                totalHP[i].GetComponent<SpriteRenderer>().sprite = fullHeart;
+                totalIcons[i].GetComponent<SpriteRenderer>().sprite = _FullHeart;
             }
             else
             {
                 // empty hearts
-                totalHP[i].GetComponent<SpriteRenderer>().sprite = emptyHeart;
+                totalIcons[i].GetComponent<SpriteRenderer>().sprite = _EmptyHeart;
             }
 
         }
@@ -92,16 +90,44 @@ public class PlayerHpHud : MonoBehaviour {
     /// </summary>
     public void IncreaseMaxHealth()
     {
-        float offset = (1.0f * totalHP.Count);
-        totalHP.Add(Instantiate(heart, new Vector3(-10 + offset, 5, 0), Quaternion.identity) as GameObject);
+        float offset = (1.0f * totalIcons.Count);
+        totalIcons.Add(Instantiate(_Icon, new Vector3(-10 + offset, 5, 0), Quaternion.identity));
 
-        MaxHP++;
+        _NumHPIcons++;
+        _MaxHP = _NumHPIcons * _HeartSegments;
     }
 
-    /*
-     If you want to use quarter hearts I would suggest having the Max HP be a multiple of 4.
-     That way, you just have to check how many times 4 goes into the current health for 
-     full hearts. Then take the modulus for how much of a quarter heart to display
-     */
+    /// <summary>
+    /// Set what you want the current health to be. 
+    /// Keep in mind you are overriding whatever the
+    /// current HP is set at.
+    /// 
+    /// Use DeltaCurrentHealth to add or subtract from current HP instead.
+    /// </summary>
+    /// <param name="inc_newCurrentHP"> What the new current health will be</param>
+    public void SetCurrentHealth(int inc_newCurrentHP)
+    {
+        if (_Hp + inc_newCurrentHP > _MaxHP)
+            _Hp = _MaxHP;
+        else if (_Hp - inc_newCurrentHP < 0)
+            _Hp = 0;
+        else 
+            _Hp = inc_newCurrentHP;
+    }
+
+    /// <summary>
+    /// Add or subtract from current HP. 
+    /// Don't have to worry about what Current HP is at.
+    /// </summary>
+    /// <param name="inc_deltaCurrentHP">How much to change the Current HP by.</param>
+    public void DeltaCurrentHealth(int inc_deltaCurrentHP)
+    {
+        if (_Hp + inc_deltaCurrentHP > _MaxHP)
+            _Hp = _MaxHP;
+        else if (_Hp - inc_deltaCurrentHP < 0)
+            _Hp = 0;
+        else
+            _Hp += inc_deltaCurrentHP;
+    }
 
 }
