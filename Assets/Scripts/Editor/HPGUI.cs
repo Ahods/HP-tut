@@ -4,7 +4,7 @@ using UnityEngine;
 [CustomEditor(typeof(PlayerHpHud))]
 public class HPGUI : Editor
 {
-    bool spriteFoldout;
+    bool spriteFoldout, posFoldout;
 
     public override void OnInspectorGUI()
     {
@@ -15,17 +15,37 @@ public class HPGUI : Editor
         IconSetUp(ref hpHud);
 
         EditorGUILayout.Space();
+        IconPostion(ref hpHud);
 
-        IconPostion(ref hpHud);        
-
+        EditorGUILayout.Space();
+        EditorGUILayout.LabelField(new GUIContent("Change Number of Icons", "Generally for testing purposes."));
         GUILayout.BeginHorizontal();
-        GUILayout.EndHorizontal();
 
+        if (GUILayout.Button("Add"))
+            hpHud.AddHPIcon(1);
+
+        if (GUILayout.Button("Remove"))
+            hpHud.RemoveHPIcon(1);
+
+        GUILayout.EndHorizontal();
+        if (GUILayout.Button("Reset"))
+            hpHud.ResetHUD();
+
+
+        // TODO - Set up if check for all requirments meet to build a HUD
+        //hpHud.UpdateHUD();
+
+        UpdateHUD(ref hpHud);
     }
 
     private void IconSetUp(ref PlayerHpHud hpHud)
     {
-        hpHud._NumHPIcons = EditorGUILayout.IntField(new GUIContent("Hp Icons", "How many icons to draw"), hpHud._NumHPIcons);
+        hpHud._MaxNumHPIcons = EditorGUILayout.IntField(
+            new GUIContent("Hp Icons", "How many icons total"), hpHud._MaxNumHPIcons);
+
+        hpHud._VisibleNumHPIcons = EditorGUILayout.IntSlider(
+            new GUIContent("Visible Hp Icons", "How many icons to show right now"), 
+            hpHud._VisibleNumHPIcons, 1, hpHud._MaxNumHPIcons);
 
         EditorGUILayout.Space();
         
@@ -43,7 +63,7 @@ public class HPGUI : Editor
 
         GUILayout.EndHorizontal();
 
-        hpHud._MaxHP = hpHud._NumHPIcons * hpHud._HeartSegments;
+        hpHud._MaxHP = hpHud._MaxNumHPIcons * hpHud._HeartSegments;
         EditorGUILayout.LabelField(new GUIContent( "Max Hp", "Max HP Icons * Heart Segments"),
            new GUIContent(hpHud._MaxHP.ToString()));
 
@@ -74,15 +94,33 @@ public class HPGUI : Editor
 
     private void IconPostion(ref PlayerHpHud hpHud)
     {
-        EditorGUILayout.LabelField("HP Position Info");
-        hpHud._IconStartPos = EditorGUILayout.Vector2Field("Start Position", hpHud._IconStartPos);
+        posFoldout = EditorGUILayout.Foldout(posFoldout, "HP Position Info");
 
-        hpHud._IconPosOffset = EditorGUILayout.FloatField(new GUIContent("HP Position Offset"," Space in between icons' x and y position."), hpHud._IconPosOffset);
+        if (posFoldout)
+        {
+            hpHud._IconStartPos = EditorGUILayout.Vector2Field("Start Position", hpHud._IconStartPos);
 
-        hpHud._IconsPerRow = EditorGUILayout.IntField(new GUIContent( "Icons Per Row", "How many Health Icons do you want in a row."), hpHud._IconsPerRow);
+            hpHud._IconPosOffset = EditorGUILayout.Vector2Field(new GUIContent("HP Position Offset", " Space in between icons' x and y position."), hpHud._IconPosOffset);
 
-        hpHud._CanvasPanel = (Transform)EditorGUILayout.ObjectField(new GUIContent("Canvas Parent", "Canvas GameObject you want to parent the health too."),
-            hpHud._CanvasPanel, typeof(Transform), true);
+            //hpHud._IconsPerRow = EditorGUILayout.IntField(new GUIContent("Icons Per Row", "How many Health Icons do you want in a row."), hpHud._IconsPerRow);
+
+            hpHud._IconsPerRow = EditorGUILayout.IntSlider(
+            new GUIContent("Icons Per Row", "How many icons in a row."),
+            hpHud._IconsPerRow, 1, hpHud._MaxNumHPIcons);
+
+            hpHud._CanvasPanel = (Transform)EditorGUILayout.ObjectField(new GUIContent("Canvas Parent", "Canvas GameObject you want to parent the health too."),
+                hpHud._CanvasPanel, typeof(Transform), true);
+        }
+
+    }
+
+    private void UpdateHUD(ref PlayerHpHud hpHud)
+    {
+        if (hpHud._MaxNumHPIcons > 0 && hpHud._EmptyHeart != null && hpHud._FullHeart != null &&
+            hpHud._HeartSegments > 0 && hpHud._Icon != null) 
+        {
+            hpHud.BuildHUD();
+        }
 
     }
 }
