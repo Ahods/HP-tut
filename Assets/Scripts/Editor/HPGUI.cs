@@ -31,10 +31,6 @@ public class HPGUI : Editor
         if (GUILayout.Button("Reset"))
             hpHud.ResetHUD();
 
-
-        // TODO - Set up if check for all requirments meet to build a HUD
-        //hpHud.UpdateHUD();
-
         UpdateHUD(ref hpHud);
     }
 
@@ -119,7 +115,10 @@ public class HPGUI : Editor
         if (hpHud._MaxNumHPIcons > 0 && hpHud._EmptyHeart != null && hpHud._FullHeart != null &&
             hpHud._HeartSegments > 0 && hpHud._Icon != null) 
         {
-            hpHud.BuildHUD();
+            if (hpHud.totalIcons.Count == hpHud._MaxNumHPIcons)
+                hpHud.UpdateHUD();
+            else
+                hpHud.BuildHUD();
         }
 
     }

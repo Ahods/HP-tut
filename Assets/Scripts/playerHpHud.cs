@@ -10,7 +10,7 @@ public class PlayerHpHud : MonoBehaviour {
     /// Using a list so we can easily add to in the future
     /// if you want the player to gain additional health
     /// </summary>
-    private List<GameObject> totalIcons = new List<GameObject>();
+    public List<GameObject> totalIcons = new List<GameObject>();
 
     /// <summary>
     /// Object to represent the player health
@@ -127,9 +127,10 @@ public class PlayerHpHud : MonoBehaviour {
     /// <summary>
     /// Draws the HP HUD based on instance variables
     /// </summary>
-    private void UpdateHUD()
+    public void UpdateHUD()
     {
-        double wholePoints = Hp / _HeartSegments;
+        double wholePoints = (double)Hp / _HeartSegments;
+        
         int row = 0;
         int col;
 
